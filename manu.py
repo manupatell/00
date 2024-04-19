@@ -164,8 +164,9 @@ db_tokens.update_one({}, {"$set": {"bot_token": bot_token}}, upsert=True)
 updater = Updater(bot_token, use_context=True)
 dispatcher = updater.dispatcher
 
-groups_collection = db['groups']
 users_collection = db['users']
+groups_collection = db['groups']
+channels_collection = db['channels']  # New collection for channels
 
 def start(update: Update, context: CallbackContext):
     if update.message.chat.type == "private":
@@ -180,12 +181,12 @@ def start(update: Update, context: CallbackContext):
             admin_user_id = primary_admin_id
             username = escape_markdown(username, version=2)
             full_name = escape_markdown(full_name, version=2)
-            message = f"#New_User ID: {user_id}\nUsername: @{username}\nFull Name: {full_name}"
+            message = f" ^New_User ID: {user_id}\nUsername: @{username}\nFull Name: {full_name}"
             context.bot.send_message(chat_id=admin_user_id, text=message, disable_web_page_preview=True)
 
-        context.bot.send_message(chat_id=update.effective_chat.id, text="😈")
+        context.bot.send_message(chat_id=update.effective_chat.id, text="RAM RAM Bhai Group Join Karo @cricxlinks")
     else:
-        context.bot.send_message(chat_id=update.effective_chat.id, text="😈")
+        context.bot.send_message(chat_id=update.effective_chat.id, text="RAM RAM Bhai Group Join Karo @cricxlinks")
 
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
@@ -198,8 +199,8 @@ def broadcast(update: Update, context: CallbackContext):
 
     message = update.message.reply_to_message or update.message
 
-    successful_broadcasts = {"groups": 0, "users": 0}
-    failed_broadcasts = {"groups": 0, "users": 0}
+    successful_broadcasts = {"groups": 0, "channels": 0, "users": 0}
+    failed_broadcasts = {"groups": 0, " channels": 0, "users": 0}
 
     for group in groups_collection.find():
         try:
@@ -207,6 +208,13 @@ def broadcast(update: Update, context: CallbackContext):
             successful_broadcasts["groups"] += 1
         except Exception as e:
             failed_broadcasts["groups"] += 1
+            
+    for channel in channels_collection.find():
+        try:
+            context.bot.copy_message(chat_id=channel["_id"], from_chat_id=update.effective_chat.id, message_id=message.message_id)
+            successful_broadcasts["channels"] += 1
+        except Exception as e:
+            failed_broadcasts["channels"] += 1
 
     for user in users_collection.find():
         try:
@@ -245,20 +253,36 @@ def save_group(update: Update, context: CallbackContext):
         group_username = escape_markdown(group_username)
         message = f"#New_Group : {group_id}\nName: {group_name}\nUsername: {group_username}"
         context.bot.send_message(chat_id=admin_user_id[0], text=message)
+        
+        
+def save_channel(update: Update, context: CallbackContext):
+    if update.effective_chat.type == 'channel':
+        channel = update.effective_chat
+        channel_id = channel.id
+        channel_username = channel.username or 'N/A'
 
-message_handler = MessageHandler(Filters.status_update.new_chat_members, save_group)
+        channels_collection.update_one({"_id": channel_id}, {"$set": {"_id": channel_id}}, upsert=True)
+
+        admin_user_id = (primary_admin_id)  # Update with your admin IDs
+        channel_username = escape_markdown(channel_username)
+        message = f"#New_Channel ID: {channel_id}\nUsername: {channel_username}" 
+        context.bot.send_message(chat_id=admin_user_id[0], text=message)
+
+
+message_handler = MessageHandler(Filters.status_update.new_chat_members, save_group, save_channel)
 dispatcher.add_handler(message_handler)
 
 def stats(update: Update, context: CallbackContext):
     admin_user_id = (primary_admin_id, 6305575094, 6704116482)
     if update.effective_user.id not in admin_user_id:
-        context.bot.send_message(chat_id=update.effective_chat.id, text="Develop your own broadcast bot using the provided repository: https://github.com/devilworlds/Broadcast")
+        context.bot.send_message(chat_id=update.effective_chat.id, text="🕊🕊")
         return
 
     user_count = users_collection.count_documents({})
     group_count = groups_collection.count_documents({})
+    channel_count = channels_collection.count_documents({})
 
-    stats_message = f"Total User IDs in database: {user_count}\nTotal Group IDs in database: {group_count}"
+    stats_message = f"Total User IDs in database: {user_count}\nTotal Group IDs in database: {group_count}\nTotal Channel IDs in database: {channel_count}"
     context.bot.send_message(chat_id=admin_user_id[0], text=stats_message)
 
     try:
